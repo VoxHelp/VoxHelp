@@ -3,4 +3,5 @@
 
 Содержит большой набор классов и функций, облегчающих разработку модов
 
-Создатели: @Onran0, function (kraject), Xertis
+Основатель: Onran
+Разработчики: Onran, function (kraject), Xertis
