@@ -114,14 +114,14 @@ function vox_math:random1to2()
 end
 
 function vox_math:randomBool(chance)
-    return vox_math:random(100) <= chance
+    return vox_math:rand_max(100) <= chance
 end
 
 function vox_math:randomAny()
-    return vox_math:random(2147483647)
+    return vox_math:rand_max(2147483647)
 end
 
-function vox_math:random(max)
+function vox_math:rand_max(max)
     if math_data["seed"] == nil then
         math_data["seed"] = vox_math:generateRandomSeed()
     end
@@ -133,6 +133,29 @@ function vox_math:random(max)
     end
 
     return result
+end
+
+function vox_math:random()
+    return (vox_math:abs(math.sin(50/(world:get_day_time()-0.5))/math.cos(90/(world:get_day_time()-0.5))))%1
+end
+
+
+function vox_math:normaldist(mean, var)
+    local function bxm()
+        local u1, u2, r, theta = 0, 0, 0, 0
+        repeat
+          u1 = vox_math:random()
+          u2 = vox_math:random()%10
+          r = vox_math:sqrt(-2 * math.log(u1))
+          theta = 2 * math.pi * u2
+        until r ~= 0
+        return r * vox_math:cos(theta), r * vox_math:sin(theta)
+    end
+
+    local _std = vox_math:sqrt(var)
+    local x1, x2 = bxm()
+    return mean + (_std * x1)
+
 end
 
 -- Part by function (kraject)
@@ -166,11 +189,22 @@ function vox_math:factorial(n)
     return fact
 end
 
+function vox_math:subfactorial(n)
+    if n < 0 then error('err [n < 0]') end
+    if n <= 1 then
+        return 1 - n
+    end
+    local result = self:subfactorial(n - 1)
+    return n * result - ((n % 2) == 0 and 1 or -1)
+end
+
+
+---------
 function vox_math:pow(base, power)
     return base ^ power
 end
-
-function vox_math:clamp(n,min,max)
+  
+function vox_math:clamp(n, min, max)
     if n > max then return max
     elseif n < min then return min
     else return n end
@@ -180,9 +214,19 @@ function vox_math:floor(n)
     return n - n % 1
 end
 
-function vox_math:round(n)
-    local powerResult = vox_math:pow(2, 52)
-    return n + powerResult - powerResult    
+function vox_math:round(n, ndp)
+    if ndp == nil then ndp = 1 end
+    local delta = 10^(ndp or 0)
+    return vox_math:floor(n*delta+0.5)/delta
+end
+
+function vox_math:gcd(a, b)
+    while b ~= 0 do a, b = b, a % b end
+    return a
+end
+
+function vox_math:lcm(a, b)
+    return a*b / vox_math:gcd(a, b)
 end
 
 function vox_math:sign(n)
@@ -193,33 +237,52 @@ function vox_math:sign(n)
     return n / vox_math:abs(n)
 end
 
- -- vox_math:internal_f(x) для log
-function vox_math:internal_f(x)
-    return 1/x  
+ -- ф-ция для log
+local function F(x)
+    if x~=0 then return 1/x end  
 end
 
 function vox_math:integral(f,a,b) -- определённый интеграл 
+    -- f <=> f(x) 
+    -- например интегрирование f(x)= sin(x) от 0 до 1.57, тогда
+    --  integral(sin,0,1.57) => 0.999... --> 1.
+    --  integral(sin,-pi,pi) => 0
+    --  [function vox_math:F(...)], a,b=... => integral(vox_math:F,a,b)
+    --  [function G(...)], a1,a2=... => integral(G, a1, a2)
     local steps = 1e6
     local h = (b - a) / steps
-    local sum = 0.5 * (vox_math:internal_f(a) + vox_math:internal_f(b))
+    local sum = 0.5 * (f(a) + f(b))
     for i = 1, steps - 1 do
-        sum = sum + vox_math:internal_f(a + i * h)
+        sum = sum + f(a + i * h)
     end
-    return h * sum
+    return vox_math:round(h * sum,6)
 end
 
-function vox_math:log(n, base)
+
+function vox_math:D(f,x) --диффур
+    -- dy/dx <=> D(y, x) -- df/dx == D(f,x)
+    -- [function vox_math:sin(t)] => D(vox_math:sin, x) 
+    -- x=0 => D(sin, x) == 1  [y=sin(x) => dy/dx=cos(x)]
+    -- omega=12, [function F(...)] => D(F, omega) == ...
+
+    local h = 1e-12
+    return (f(x+h)-f(x))/h
+end
+
+
+
+function vox_math:log(n, base) -- лог-м
     if base > 0 or base ~= 1 or n > 0 then
-        return vox_math:integral(f,1,n) / vox_math:integral(f,1,base)
+        return vox_math:integral(F,1,n) / vox_math:integral(F,1,base)
     end
 end
 
 function vox_math:ln(n) -- натуральный лог-м
-    if n > 0 then return vox_math:integral(f,1,n) end
+    if n > 0 then return vox_math:integral(F,1,n) end
 end
 
 function vox_math:log10(n) -- десятичный лог-м ... log10 == lg == log(n=..., base=10)
-    if n > 0 then return vox_math:integral(f,1,n)/vox_math:ln(10) end
+    if n > 0 then return vox_math:integral(F,1,n)/vox_math:ln(10) end
 end
 
 function vox_math:exp(x) -- экспанента
@@ -230,7 +293,7 @@ function vox_math:sqrt(n) --радикал
     if n >= 0 then return n^(1/2) end
 end
 
-function vox_math:inverse_sqrt(x)
+function vox_math:inverse_sqrt(x) -- обратный радикал
     return 1/vox_math:sqrt(x)
 end
 
@@ -261,13 +324,13 @@ function vox_math:cosec(n)
 end
 
 -- reverse trigonometric func
-function vox_math:atan2(y, x)
+function vox_math:atan2(y, x) 
     local func = 0
     local k = y/x
     for n=0,1000 do
         func = func + ((-1)^n)*((k^(2*n+1))/(2*n+1))
     end
-    return vox_math:rad_to_deg(func)
+    return vox_math:deg(func)
 end
 
 function vox_math:atan(y, x)
@@ -281,33 +344,99 @@ end
 
 -- hyperbolic func (base)
 -- решения задач связанных для описания поворотов в двумерных подпространствах.
-function vox_math:sh(n)
+-- x = ch(t)
+-- y = sh(t)
+-- при любых x => ch^2 - sh^2 = 1
+-- sh(x + y) = sh(x) * ch(y) + ch(x) * sh(y)
+-- sh(2x) = 2*sh(x)*ch(x)
+-- ch(2x) = ch^2(x) + sh^2(y)
+function vox_math:sh(n) -- гипербо-ий синус
     return ((vox_math:e()^n)-(vox_math:e()^(-n)))/2
 end
 
-function vox_math:ch(n)
+function vox_math:ch(n) -- гипербо-ий косинус
     return ((vox_math:e()^n)+(vox_math:e()^(-n)))/2
 end
 
+function vox_math:tanh(x)
+    return vox_math:sh(x)/vox_math:ch(x)
+end
+
+function vox_math:cth(x)
+    return 1/vox_math:tanh(x)
+end
+
+function vox_math:sch(x)
+    if x ~= 0 then return 1/vox_math:ch(x) end
+end
+
+function vox_math:csch(x)
+    if x ~= 0 then return 1/vox_math:sh(x) end
+end
+
+function vox_math:arsh(x)
+    return vox_math:ln(x+vox_math:sqrt(x^2+1))
+end
+
+function vox_math:arth(x)
+    if vox_math:abs(x)<1 then 
+        return vox_math:ln((vox_math:sqrt(1-x^2))/(1-x))
+    end
+end
+
+function vox_math:arch(x)
+    if x >= 1 then return vox_math:ln(x+vox_math:sqrt(x^2-1)) end
+end
+
+function vox_math:arcth(x)
+    if vox_math:abs(x) > 1 then 
+        return vox_math:ln((vox_math:sqrt(x^2-1))/(x-1))
+    end
+end
+
+function vox_math:arsch(x)
+    if x > 0 and x <= 1 then
+        return vox_math:ln((1+vox_math:sqrt(1-x^2))/(x))
+    end
+end
+------------------------------------------------
+
+
+function vox_math:binonial(n, k)
+    return vox_math:factorial(n) / (vox_math:factorial(k)*vox_math:factorial(n-k))
+end
+
+
+-- Поворота элемента на угол phi
+local function rotate(x, y, phi)
+    local newX = x * vox_math:cos(phi) - y * vox_math:sin(phi)
+    local newY = x * vox_math:sin(phi) + y * vox_math:cos(phi)
+    return newX, newY
+  end
+
 --
-function vox_math:cartesianToPolar(x,y) -- переход на полярные координаты
+
+
+
+-- oper translate
+function vox_math:rad(alpha) -- из градусов в радианы
+    return (alpha*vox_math:pi())/180
+end
+
+function vox_math:deg(alpha) --из радианов в градусы
+    return (alpha*180)/vox_math:pi()
+end
+
+
+function vox_math:cartToPolar(x,y) -- переход на полярные координаты
     local r = (x^2+y^2)^0.5
     local phi = vox_math:atan2(y,x)
     return r, phi
 end
 
-function vox_math:polarToCartesian(x,y) -- переход на декартовые координаты
+function vox_math:polarToCart(x,y) -- переход на декартовые координаты
     local r = x
     local phi = y
     return (r * vox_math:cos(phi)), (r * vox_math:sin(phi))
 end
-
-
--- oper translate
-function vox_math:deg_to_rad(alpha) -- из градусов в радианы
-    return (alpha*vox_math:pi())/180
-end
-
-function vox_math:rad_to_deg(alpha) --из радианов в градусы
-    return (alpha*180)/vox_math:pi()
-end
+---
