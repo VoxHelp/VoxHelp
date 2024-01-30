@@ -92,7 +92,7 @@ function vox_list:clone()
     local clone = vox_list:new(self._size)
 
     for i = 0, self:iterations() do
-        clone:add(self.get(i))
+        clone:add(self:get(i))
     end
 
     return clone
@@ -126,7 +126,7 @@ function vox_list:removeAt(index)
 
     for i = 0, self:iterations() do
         if i ~= index then
-            clone:add(self.get(i))
+            clone:add(self:get(i))
         end
     end
 
