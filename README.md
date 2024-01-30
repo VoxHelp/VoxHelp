@@ -3,4 +3,4 @@
 
 📕 Содержит большой набор классов и функций, облегчающих разработку контент-паков
 
-📌 Разработчики: [Onran](https://github.com/Onran0), [kraject](https://github.com/kraject), Xertis
+📌 Разработчики: [Onran](https://github.com/Onran0), [Cogitary](https://github.com/DoubleDataStack), Xertis
