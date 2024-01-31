@@ -12,31 +12,15 @@ function vox_math.new()
 end
 
 function vox_math.abs(n)
-    if n < 0 then
-        n = -n
-    end
-    
-    return n
+    return n < 0 and -n or n
 end
 
 function vox_math.max(num1, num2)
-    local maxx = 0
-    if num1 > num2 then
-        maxx = num1
-    elseif num1 <= num2 then
-        maxx = num2
-    end
-    return maxx
+    return num1 < num2 and num2 or num1
 end
         
 function vox_math.min(num1, num2)
-    local minn = 1000
-    if num1 < num2 then
-        minn = num2
-    elseif num1 <= num2 then
-        minn = num1
-    end
-    return minn
+    vox_math:max(num1,num2)
 end
 
 -- Onran Part
@@ -116,12 +100,19 @@ function vox_math.lcm(a, b)
     return a*b / vox_math.gcd(a, b)
 end
 
-function vox_math.sign(n)
-    if n == 0 then
-        return 0
-    end
+function vox_math.reduct(a, b)
+    -- 5/10 -> 1/2
+    -- 3/90 -> 1/30
+    -- 2/54 -> 1/27 
+   local k = vox_math.gcd(a,b)
+   return (a//k),(b//k)
+end
 
-    return n / vox_math.abs(n)
+
+function vox_math.sign(n)
+    if n < 0 then return -1 
+    elseif n > 0 then return 1 end
+    return 0
 end
 
 function vox_math.modf(n) -- возврат целой и дробной части
@@ -207,8 +198,8 @@ end
 
 --trigonometric func
 function vox_math.sin(x)
-    local term
     local t = x%(vox_math.pi()*2)
+    local term
     local sin = 0
     local sign = 1
     local pow = 1
@@ -334,21 +325,31 @@ function vox_math.deg(alpha) --из радианов в градусы
     return (alpha*180)/vox_math.pi()
 end
 
-function vox_math.cartToPolar(x,y) -- переход на полярные координаты
+function vox_math.toPolar(x,y) -- переход на полярные координаты
     local r = (x^2+y^2)^0.5
     local phi = vox_math.atan2(y,x)
     return r, phi
 end
 
-function vox_math.polarToCart(x,y) -- переход на декартовые координаты
+function vox_math.toCart(x,y) -- переход на декартовые координаты
     local r = x
     local phi = y
     return (r * vox_math.cos(phi)), (r * vox_math.sin(phi))
 end
 
+function  vox_math.toCylind(x, y, z) -- переход в цилиндрические координаты
+    local r = vox_math.sqrt(x*x + z*z)
+    local theta = vox_math.atan2(z, x) --возврат угла в градусах
+    return r, theta, y
+end
+
 --Static
-function vox_math.binonial(n, k)
+function vox_math.C(n, k)
     return vox_math.factorial(n) / (vox_math.factorial(k)*vox_math.factorial(n-k))
+end
+
+function vox_math.A(n, m)
+    return vox_math.factorial(m) / (vox_math.factorial(m-n))
 end
 
 
