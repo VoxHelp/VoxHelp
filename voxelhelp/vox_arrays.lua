@@ -31,4 +31,40 @@ function vox_arrays.toList(array)
 	return list
 end
 
+function vox_arrays.size(array) --размер массива
+    local size = 0
+    for _, _ in pairs(array) do
+        size = size + 1
+    end
+    return size
+end
+
+function vox_arrays.toString(array) --преобразование массива в строку
+    local str = "{"
+    for i, value in ipairs(array) do
+        if i ~= 1 then str = str .. ", " end
+        str = str .. tostring(value)
+    end
+    return str .. "}"
+end
+
+function vox_arrays.some(array, func) -- проверка наличия элемента в массиве
+    for _, value in ipairs(array) do
+        if func(value) then return true end
+    end
+    return false
+end
+
+function vox_arrays.every(array, func) -- проверка отсутствие элемента
+    for _, value in ipairs(array) do
+        if not func(value) then return false end
+    end
+    return true
+end
+
+function vox_arrays.clear()
+	self = {}
+	return self
+end
+
 return vox_arrays
