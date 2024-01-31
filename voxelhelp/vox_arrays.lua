@@ -1,14 +1,14 @@
-dofile("res/content/voxelhelp/vox_list.lua")
+load_script("voxelhelp:vox_list.lua")
 
 vox_arrays = { }
 
-function vox_arrays:createArrayFromElement(element)
+function vox_arrays.createArrayFromElement(element)
 	local array = { }
 	array[0] = element
 	return array
 end
 
-function vox_arrays:array_contains(array, element)
+function vox_arrays.array_contains(array, element)
 
 	for i = 0, #array do
 		if array[i] == element then
@@ -19,7 +19,7 @@ function vox_arrays:array_contains(array, element)
 	return false
 end
 
-function vox_arrays:toList(array)
+function vox_arrays.toList(array)
 	local list = vox_list:new()
 
 	if array ~= nil then
@@ -30,3 +30,5 @@ function vox_arrays:toList(array)
 
 	return list
 end
+
+return vox_arrays
