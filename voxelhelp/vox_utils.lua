@@ -1,10 +1,10 @@
-dofile("res/content/voxelhelp/vox_arrays.lua")
-dofile("res/content/voxelhelp/vox_meta.lua")
-dofile("res/content/voxelhelp/vox_list.lua")
+load_script("voxelhelp:vox_arrays.lua")
+load_script("voxelhelp:vox_meta.lua")
+load_script("voxelhelp:vox_list.lua")
 
 vox_utils = { }
 
-function vox_utils:getShiftedPositionRelativeRotation(x, y, z, shift, states)
+function vox_utils.getShiftedPositionRelativeRotation(x, y, z, shift, states)
 	if states == nil then
 		states = get_block_states(x, y, z)
 	end
@@ -26,7 +26,7 @@ function vox_utils:getShiftedPositionRelativeRotation(x, y, z, shift, states)
 	return x, y, z
 end
 
-function vox_utils:toBlockIndices(namesList)
+function vox_utils.toBlockIndices(namesList)
 	local ids = vox_list:new()
 
 	for i = 0, namesList:iterations() do
@@ -36,7 +36,7 @@ function vox_utils:toBlockIndices(namesList)
 	return ids
 end
 
-function vox_utils:toBlockNames(indicesList)
+function vox_utils.toBlockNames(indicesList)
 	local names = vox_list:new()
 
 	for i = 0, indicesList:iterations() do
@@ -46,27 +46,27 @@ function vox_utils:toBlockNames(indicesList)
 	return names
 end
 
-function vox_utils:findClosestBlockAlongChain(x, y, z, chainBlockName, targetNames)
-	return vox_utils:findClosestBlockAlongChainByIDs(x, y, z, block_index(chainBlockName), vox_utils:toBlockIndices(targetNames))
+function vox_utils.findClosestBlockAlongChain(x, y, z, chainBlockName, targetNames)
+	return vox_utils.findClosestBlockAlongChainByIDs(x, y, z, block_index(chainBlockName), vox_utils.toBlockIndices(targetNames))
 end
 
-function vox_utils:findClosestBlockAlongChainByIDs(x, y, z, chainId, targetIds, checkedMeta)
+function vox_utils.findClosestBlockAlongChainByIDs(x, y, z, chainId, targetIds, checkedMeta)
 	if checkedMeta == nil then
 		checkedMeta = vox_meta:new()
 	end
 
 	for i = -1, 1, 2 do
-		fx, fy, fz = vox_utils:internal_nextChain(x, y + i, z, chainId, targetIds, checkedMeta)
+		fx, fy, fz = vox_utils.internal_nextChain(x, y + i, z, chainId, targetIds, checkedMeta)
 		if fy ~= -1 then
 			return fx, fy, fz
 		end
 
-		fx, fy, fz = vox_utils:internal_nextChain(x + i, y, z, chainId, targetIds, checkedMeta)
+		fx, fy, fz = vox_utils.internal_nextChain(x + i, y, z, chainId, targetIds, checkedMeta)
 		if fy ~= -1 then
 			return fx, fy, fz
 		end
 
-		fx, fy, fz = vox_utils:internal_nextChain(x, y, z + i, chainId, targetIds, checkedMeta)
+		fx, fy, fz = vox_utils.internal_nextChain(x, y, z + i, chainId, targetIds, checkedMeta)
 		if fy ~= -1 then
 			return fx, fy, fz
 		end
@@ -74,7 +74,7 @@ function vox_utils:findClosestBlockAlongChainByIDs(x, y, z, chainId, targetIds, 
 	return -1, -1, -1
 end
 
-function vox_utils:internal_nextChain(x, y, z, chainId, targetIds, checkedMeta)
+function vox_utils.internal_nextChain(x, y, z, chainId, targetIds, checkedMeta)
 	if checkedMeta:getVar(x, y, z, "isChecked") then
 		return -1, -1, -1
 	else
@@ -84,40 +84,40 @@ function vox_utils:internal_nextChain(x, y, z, chainId, targetIds, checkedMeta)
 	local blockId = get_block(x, y, z)
 
 	if blockId == chainId then
-		if vox_utils:isAnyBlockNearbyByIDs(x, y, z, targetIds) then
+		if vox_utils.isAnyBlockNearbyByIDs(x, y, z, targetIds) then
 			return x, y, z
 		end
 
-		return vox_utils:findClosestBlockAlongChainByIDs(x, y, z, chainId, targetIds, checkedMeta)
+		return vox_utils.findClosestBlockAlongChainByIDs(x, y, z, chainId, targetIds, checkedMeta)
 	end
 	return -1, -1, -1
 end
 
-function vox_utils:replaceBlocksAlongChain(x, y, z, targetBlockName, replacementBlockName)
-	vox_utils:replaceBlocksAlongChainByIDs(x, y, z, block_index(targetBlockName), block_index(replacementBlockName))
+function vox_utils.replaceBlocksAlongChain(x, y, z, targetBlockName, replacementBlockName)
+	vox_utils.replaceBlocksAlongChainByIDs(x, y, z, block_index(targetBlockName), block_index(replacementBlockName))
 end
 
-function vox_utils:replaceBlocksAlongChainByIDs(x, y, z, targetId, replacementId)
+function vox_utils.replaceBlocksAlongChainByIDs(x, y, z, targetId, replacementId)
 	for i = -1, 1, 2 do
-		vox_utils:internal_tryReplaceBlockAlongChain(x, y + i, z, targetId, replacementId)
-		vox_utils:internal_tryReplaceBlockAlongChain(x + i, y, z, targetId, replacementId)
-		vox_utils:internal_tryReplaceBlockAlongChain(x, y, z + i, targetId, replacementId)
+		vox_utils.internal_tryReplaceBlockAlongChain(x, y + i, z, targetId, replacementId)
+		vox_utils.internal_tryReplaceBlockAlongChain(x + i, y, z, targetId, replacementId)
+		vox_utils.internal_tryReplaceBlockAlongChain(x, y, z + i, targetId, replacementId)
 	end
 end
 
-function vox_utils:internal_tryReplaceBlockAlongChain(x, y, z, targetId, replacementId)
+function vox_utils.internal_tryReplaceBlockAlongChain(x, y, z, targetId, replacementId)
 	local blockId = get_block(x, y, z)
 	if blockId == targetId and blockId ~= replacementId then
 		set_block(x, y, z, replacementId, get_block_states(x, y, z))
-		vox_utils:replaceBlocksAlongChainByIDs(x, y, z, targetId, replacementId)
+		vox_utils.replaceBlocksAlongChainByIDs(x, y, z, targetId, replacementId)
 	end
 end
 
-function vox_utils:replaceAnyBlocksNearby(x, y, z, blocksList, replacement)
-	return vox_utils:replaceAnyBlocksNearbyByIDs(x, y, z, vox_utils:toBlockIndices(blocksList), block_index(replacement))
+function vox_utils.replaceAnyBlocksNearby(x, y, z, blocksList, replacement)
+	return vox_utils.replaceAnyBlocksNearbyByIDs(x, y, z, vox_utils.toBlockIndices(blocksList), block_index(replacement))
 end
 
-function vox_utils:replaceAnyBlocksNearbyByIDs(x, y, z, blocks, replacementId)
+function vox_utils.replaceAnyBlocksNearbyByIDs(x, y, z, blocks, replacementId)
 	for i = -1, 1, 2 do
 		if blocks:contains(get_block(x + i, y, z)) then
 			set_block(x + i, y, z, replacementId, get_block_states(x + i, y, z))
@@ -133,11 +133,11 @@ function vox_utils:replaceAnyBlocksNearbyByIDs(x, y, z, blocks, replacementId)
 	end
 end
 
-function vox_utils:getPositionsOfNearbyBlocks(x, y, z, blocksList)
-	return vox_utils:getPositionsOfNearbyBlocksByIDs(x, y, z, vox_utils:toBlockIndices(blocksList))
+function vox_utils.getPositionsOfNearbyBlocks(x, y, z, blocksList)
+	return vox_utils.getPositionsOfNearbyBlocksByIDs(x, y, z, vox_utils.toBlockIndices(blocksList))
 end
 
-function vox_utils:getNearbyBlocks(x, y, z)
+function vox_utils.getNearbyBlocks(x, y, z)
 
 	local nearbyBlocks = vox_list:new()
 
@@ -150,30 +150,30 @@ function vox_utils:getNearbyBlocks(x, y, z)
 	return nearbyBlocks
 end
 
-function vox_utils:getPositionsOfNearbyBlocksByIDs(x, y, z, blocks)
+function vox_utils.getPositionsOfNearbyBlocksByIDs(x, y, z, blocks)
 
 	local nearbyBlocks = vox_list:new()
 
 	for i = -1, 1, 2 do
-		vox_utils:internal_tryAddToNearbyBlocks(x + i, y, z, nearbyBlocks, blocks)
-		vox_utils:internal_tryAddToNearbyBlocks(x, y + i, z, nearbyBlocks, blocks)
-		vox_utils:internal_tryAddToNearbyBlocks(x, y, z + i, nearbyBlocks, blocks)
+		vox_utils.internal_tryAddToNearbyBlocks(x + i, y, z, nearbyBlocks, blocks)
+		vox_utils.internal_tryAddToNearbyBlocks(x, y + i, z, nearbyBlocks, blocks)
+		vox_utils.internal_tryAddToNearbyBlocks(x, y, z + i, nearbyBlocks, blocks)
 	end
 
 	return nearbyBlocks
 end
 
-function vox_utils:internal_tryAddToNearbyBlocks(x, y, z, nearbyBlocks, blocks)
+function vox_utils.internal_tryAddToNearbyBlocks(x, y, z, nearbyBlocks, blocks)
 	if blocks:contains(get_block(x, y, z)) then
 		nearbyBlocks:add( { x = x, y = y, z = z } )
 	end
 end
 
-function vox_utils:isAnyBlockNearby(x, y, z, blocksList)
-	return vox_utils:isAnyBlockNearbyByIDs(x, y, z, vox_utils:toBlockIndices(blocksList))
+function vox_utils.isAnyBlockNearby(x, y, z, blocksList)
+	return vox_utils.isAnyBlockNearbyByIDs(x, y, z, vox_utils.toBlockIndices(blocksList))
 end
 
-function vox_utils:isAnyBlockNearbyByIDs(x, y, z, blocks)
+function vox_utils.isAnyBlockNearbyByIDs(x, y, z, blocks)
 
 	for i = -1, 1, 2 do
 		if blocks:contains(get_block(x + i, y, z)) then
@@ -190,3 +190,5 @@ function vox_utils:isAnyBlockNearbyByIDs(x, y, z, blocks)
 	end
 	return false
 end
+
+return vox_utils
