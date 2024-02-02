@@ -63,7 +63,7 @@ function vox_arrays.every(array, func) -- проверка отсутствие 
 end
 
 function vox_arrays.clear()
-	self = {}
+	local self = {}
 	return self
 end
 
