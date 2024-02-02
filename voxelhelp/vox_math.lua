@@ -2,13 +2,6 @@
 
 vox_math = { }
 
-function vox_math.new()
-    local o = {}
-    setmetatable(o, self)
-    self.__index = self
-    return o
-end
-
 function vox_math.abs(n)
     return n < 0 and -n or n
 end
