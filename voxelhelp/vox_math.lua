@@ -2,8 +2,6 @@
 
 vox_math = { }
 
-local math_data = { }
-
 function vox_math.new()
     local o = {}
     setmetatable(o, self)
