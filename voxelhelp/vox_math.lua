@@ -12,32 +12,17 @@ function vox_math.new()
 end
 
 function vox_math.abs(n)
-    if n < 0 then
-        n = -n
-    end
-    
-    return n
+    return n < 0 and -n or n
 end
 
 function vox_math.max(num1, num2)
-    local maxx = 0
-    if num1 > num2 then
-        maxx = num1
-    elseif num1 <= num2 then
-        maxx = num2
-    end
-    return maxx
+    return (num1 >= num2) and num1 or num2
 end
-        
+
 function vox_math.min(num1, num2)
-    local minn = 1000
-    if num1 < num2 then
-        minn = num2
-    elseif num1 <= num2 then
-        minn = num1
-    end
-    return minn
+    return (num1 <= num2) and num1 or num2
 end
+
 
 -- Onran Part
 
@@ -59,26 +44,13 @@ end
 
 
 function vox_math.int(n)
-    if n >= 0 then
-        return vox_math.floor(n)
-    else
-        return n - n % -1
-    end
+    return n >= 0 and vox_math.floor(n) or n - n % -1
 end
 
 function vox_math.ceil(n)
     local nint = vox_math.int(n)
-    if n <= 0 then
-        return nint
-    else
-        if nint == n then
-            return nint
-        else
-            return nint + 1
-        end
-    end
+    return n > nint and nint + 1 or nint
 end
-
 
 -- Part by function (kraject)
 
@@ -103,20 +75,27 @@ function vox_math.floor(n)
 end
 
 function vox_math.round(n)
-    local powerResult = vox_math.pow(2, 52)
-    return n + powerResult - powerResult    
+    return num >= 0 and vox_math.floor(num + 0.5) or vox_math.ceil(num - 0.5)
 end
 
-function vox_math.gcd(a, b)
+function vox_math.gcd(a, b) -- нод
     while b ~= 0 do a, b = b, a % b end
     return a
 end
 
-function vox_math.lcm(a, b)
+function vox_math.lcm(a, b) -- нок
     return a*b / vox_math.gcd(a, b)
 end
 
-function vox_math.sign(n)
+function vox_math.reduct(a, b) --сокращает дроби
+    -- 5/10 -> 1/2
+    -- 3/90 -> 1/30
+    -- 2/54 -> 1/27 
+   local k = vox_math.gcd(a,b)
+   return (a//k),(b//k)
+end
+
+function vox_math.sign(n) -- определения знака
     if n == 0 then
         return 0
     end
@@ -200,6 +179,10 @@ function vox_math.dist2(x0,y0,x1,y1)
     return vox_math.sqrt((x1-x0)^2+(y1-y0)^2)
 end
 
+function vox_math.hypot(x,y)
+    return vox_math.sqrt(x*x+y*y)
+end
+
 function vox_math.distline(x0,x1)
     return vox_math.abs(x1-x0)
 end
@@ -207,8 +190,8 @@ end
 
 --trigonometric func
 function vox_math.sin(x)
-    local term
     local t = x%(vox_math.pi()*2)
+    local term
     local sin = 0
     local sign = 1
     local pow = 1
@@ -255,17 +238,9 @@ function vox_math.atan2(y, x)
     for n=0,1000 do
         func = func + ((-1)^n)*((k^(2*n+1))/(2*n+1))
     end
-    return vox_math.deg(func)
-end
-
-function vox_math.atan(y, x)
-    local func = 0
-    local k = y/x
-    for n=0,1000 do
-        func = func + ((-1)^n)*((k^(2*n+1))/(2*n+1))
-    end
     return func
 end
+
 
 
 -- hyperbolic func
@@ -334,23 +309,50 @@ function vox_math.deg(alpha) --из радианов в градусы
     return (alpha*180)/vox_math.pi()
 end
 
-function vox_math.cartToPolar(x,y) -- переход на полярные координаты
+function vox_math.toPolar(x,y) -- переход на полярные координаты
     local r = (x^2+y^2)^0.5
     local phi = vox_math.atan2(y,x)
     return r, phi
 end
 
-function vox_math.polarToCart(x,y) -- переход на декартовые координаты
+function vox_math.toCart(x,y) -- переход на декартовые координаты
     local r = x
     local phi = y
     return (r * vox_math.cos(phi)), (r * vox_math.sin(phi))
 end
 
---Static
-function vox_math.binonial(n, k)
-    return vox_math.factorial(n) / (vox_math.factorial(k)*vox_math.factorial(n-k))
+function  vox_math.toCylind(x, y, z) -- переход в цилиндрические координаты
+    local r = vox_math.sqrt(x*x + z*z)
+    local theta = vox_math.atan2(z, x) --возврат угла в градусах
+    return r, theta, y
 end
 
+--Static
+function vox_math.Binomial(n, k)
+    if (k < 0) or (n < 0) or (k > n) then
+        error("404")
+    end
+    if k > n/2 then
+        k = n - k
+    end
+    local result = 1.0
+    for i = 1, k do
+        result = result * (n - (k - i))
+        result = result / i
+    end
+    return result
+end
+
+function vox_math.A(n, m)
+    if n < 0 or m < 0 or n > m then
+        return nil, "Invalid input"
+    end
+    local result = 1
+    for i = m, m-n+1, -1 do
+        result = result * i
+    end
+    return result
+end
 
 --Experimental Func (Random)
 function vox_math.generateRandomSeed(iteration) -- 
