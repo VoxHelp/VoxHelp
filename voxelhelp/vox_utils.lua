@@ -1,5 +1,5 @@
-load_script("voxelhelp:vox_arrays.lua")
-load_script("voxelhelp:vox_meta.lua")
+vox_arrays = load_script("voxelhelp:vox_arrays.lua")
+load_script("voxelhelp:vox_runtime_meta.lua")
 load_script("voxelhelp:vox_list.lua")
 
 vox_utils = { }
@@ -52,7 +52,7 @@ end
 
 function vox_utils.findClosestBlockAlongChainByIDs(x, y, z, chainId, targetIds, checkedMeta)
 	if checkedMeta == nil then
-		checkedMeta = vox_meta:new()
+		checkedMeta = vox_runtime_meta:new()
 	end
 
 	for i = -1, 1, 2 do
@@ -138,6 +138,23 @@ function vox_utils.getPositionsOfNearbyBlocks(x, y, z, blocksList)
 end
 
 function vox_utils.getNearbyBlocks(x, y, z)
+
+	local nearbyBlocks = vox_list:new()
+
+	for i = -1, 1, 2 do
+		vox_utils.internal_addToNearbyBlocks(nearbyBlocks, x + i, y, z)
+		vox_utils.internal_addToNearbyBlocks(nearbyBlocks, x, y + i, z)
+		vox_utils.internal_addToNearbyBlocks(nearbyBlocks, x, y, z + i)
+	end
+
+	return nearbyBlocks
+end
+
+function vox_utils.internal_addToNearbyBlocks(nearbyBlocks, x, y, z)
+	nearbyBlocks:add({ name = block_name(get_block(x, y, z)), x = x, y = y, z = z })
+end
+
+function vox_utils.getNearbyBlocksNames(x, y, z)
 
 	local nearbyBlocks = vox_list:new()
 

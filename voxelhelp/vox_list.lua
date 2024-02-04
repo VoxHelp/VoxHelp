@@ -11,15 +11,17 @@ function vox_list:new(_size)
     setmetatable(o, self)
     self.__index = self
     self._size = _size or 0
-    self._table = {}
+    self._table = { }
     return o
 end
 
 function vox_list:toArray()
     local array = { }
 
-    for i = 0, self:iterations() do
-        array[i] = self:get(i)
+    if self:size() > 0 then
+        for i = 0, self:iterations() do
+            array[i + 1] = self:get(i)
+        end
     end
 
     return array
@@ -28,8 +30,11 @@ end
 function vox_list:print()
     local msg = "Size: %i\nIterations: %i"
     print(msg:format(self:size(), self:iterations()))
-    for i = 0, self:iterations() do
-        print(self:get(i))
+
+    if self:size() > 0 then
+        for i = 0, self:iterations() do
+            print(self:get(i))
+        end
     end
 end
 
@@ -89,10 +94,12 @@ function vox_list:get(index)
 end
 
 function vox_list:clone()
-    local clone = vox_list:new(self._size)
+    local clone = vox_list:new()
 
-    for i = 0, self:iterations() do
-        clone:add(self:get(i))
+    if self._size > 0 then
+        for i = 0, self:iterations() do
+            clone:add(self:get(i))
+        end
     end
 
     return clone
@@ -118,19 +125,23 @@ function vox_list:remove(element)
 end
 
 function vox_list:removeAt(index)
-    if index < 0 then
+    if index < 0 or index >= self._size then
         return false
     end
 
-    local clone = vox_list:new(self._size)
+    local clone = vox_list:new()
 
-    for i = 0, self:iterations() do
-        if i ~= index then
-            clone:add(self:get(i))
+    if self._size > 0 then
+        for i = 0, self:iterations() do
+
+            if i ~= index then
+                clone:add(self:get(i))
+            end
         end
     end
-
+    
     self._table = clone._table
+    self._size = clone._size
 
     return true
 end

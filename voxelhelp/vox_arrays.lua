@@ -23,8 +23,12 @@ function vox_arrays.toList(array)
 	local list = vox_list:new()
 
 	if array ~= nil then
-		for i = 0, #array do
-			list:add(array[i])
+		local len = #array
+
+		if len > 0 then
+			for i = 1, #array do
+				list:add(array[i])
+			end
 		end
 	end
 

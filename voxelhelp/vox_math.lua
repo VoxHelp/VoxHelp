@@ -66,7 +66,7 @@ function vox_math.floor(n)
 end
 
 function vox_math.round(n)
-    return num >= 0 and vox_math.floor(num + 0.5) or vox_math.ceil(num - 0.5)
+    return n >= 0 and vox_math.floor(n + 0.5) or vox_math.ceil(n - 0.5)
 end
 
 function vox_math.gcd(a, b) -- нод
@@ -83,7 +83,7 @@ function vox_math.reduct(a, b) --сокращает дроби
     -- 3/90 -> 1/30
     -- 2/54 -> 1/27 
    local k = vox_math.gcd(a,b)
-   return (a//k),(b//k)
+   return vox_math.int(a/k), vox_math.int(b/k)
 end
 
 function vox_math.sign(n) -- определения знака
