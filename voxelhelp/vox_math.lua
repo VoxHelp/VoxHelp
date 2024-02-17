@@ -1,19 +1,4 @@
--- Xertis Part
-
-vox_math = { }
-
-function vox_math.abs(n)
-    return n < 0 and -n or n
-end
-
-function vox_math.max(num1, num2)
-    return (num1 >= num2) and num1 or num2
-end
-
-function vox_math.min(num1, num2)
-    return (num1 <= num2) and num1 or num2
-end
-
+local vox_math = { }
 
 -- Onran Part
 vox_math["vector3"] = { }
@@ -72,6 +57,18 @@ function vox_math.ceil(n)
 end
 
 -- Part by Cogitary
+
+function vox_math.abs(n)
+    return n < 0 and -n or n
+end
+
+function vox_math.max(num1, num2)
+    return (num1 >= num2) and num1 or num2
+end
+
+function vox_math.min(num1, num2)
+    return (num1 <= num2) and num1 or num2
+end
 
 function vox_math.factorial(n)
     if n == 0 then return 1
@@ -360,3 +357,5 @@ function vox_math.A(n, m)
     end
     return result
 end
+
+return vox_math

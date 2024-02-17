@@ -1,4 +1,4 @@
-vox_list = { }
+local vox_list = { }
 
 function vox_list:fromElement(element)
     o = vox_list:new()
@@ -167,3 +167,5 @@ function vox_list:removeAt(index)
 
     return true
 end
+
+return vox_list

@@ -1,6 +1,6 @@
-load_script("voxelhelp:vox_tables.lua")
-load_script("voxelhelp:vox_list.lua")
-load_script("voxelhelp:vox_metadata.lua")
+local vox_tables = load_script("voxelhelp:vox_tables.lua")
+local vox_list = load_script("voxelhelp:vox_list.lua")
+local vox_metadata = load_script("voxelhelp:vox_metadata.lua")
 
 local vox_ticked_block = { onTick = nil }
 

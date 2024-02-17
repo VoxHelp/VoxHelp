@@ -1,4 +1,4 @@
-vox_help = { version = "1.6" }
+local vox_help = { version = "1.6" }
 
 function vox_help.getAbsoluteVoxelHelpSavesPath(saving)
 	local path = file.resolve("world:voxelhelp")

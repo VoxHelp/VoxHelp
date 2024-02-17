@@ -1,8 +1,8 @@
-vox_arrays = load_script("voxelhelp:vox_arrays.lua")
-load_script("voxelhelp:vox_math.lua")
-load_script("voxelhelp:vox_list.lua")
+local vox_arrays = load_script("voxelhelp:vox_arrays.lua")
+local vox_math = load_script("voxelhelp:vox_math.lua")
+local vox_list = load_script("voxelhelp:vox_list.lua")
 
-vox_utils = { }
+local vox_utils = { }
 
 function vox_utils.getShiftedPositionRelativeRotation(x, y, z, shift)
 	local coords = { }

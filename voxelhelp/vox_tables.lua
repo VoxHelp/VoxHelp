@@ -1,4 +1,4 @@
-vox_tables = { }
+local vox_tables = { }
 
 function vox_tables.add(tableVal, newValue)
 	vox_tables:insert(tableVal, #tableVal, newValue)

@@ -1,4 +1,4 @@
-vox_container = {}
+local vox_container = {}
 
 function vox_container:new(object)
     local o = { object = nil }
@@ -15,3 +15,5 @@ end
 function vox_container:set(object)
 	self.object = object
 end
+
+return vox_container

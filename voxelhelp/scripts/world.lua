@@ -1,4 +1,4 @@
-load_script("voxelhelp:vox_metadata.lua")
+local vox_metadata = load_script("voxelhelp:vox_metadata.lua")
 
 function on_world_open()
 	print("Voxel Help: Loading metadata")

@@ -1,6 +1,6 @@
-load_script("voxelhelp:vox_list.lua")
+local vox_list = load_script("voxelhelp:vox_list.lua")
 
-vox_arrays = { }
+local vox_arrays = { }
 
 function vox_arrays.createArrayFromElement(element)
 	local array = { }
