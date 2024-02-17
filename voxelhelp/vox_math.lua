@@ -16,6 +16,34 @@ end
 
 
 -- Onran Part
+vox_math["vector3"] = { }
+
+-- vox_math.vector3
+
+function vox_math.vector3.add(x0, y0, z0, x1, y1, z1)
+    return x0 + x1, y0 + y1, z0 + z1
+end
+
+function vox_math.vector3.sub(x0, y0, z0, x1, y1, z1)
+    return x0 - x1, y0 - y1, z0 - z1
+end
+
+function vox_math.vector3.mul(x0, y0, z0, x1, y1, z1)
+    return x0 * x1, y0 * y1, z0 * z1
+end
+
+function vox_math.vector3.div(x0, y0, z0, x1, y1, z1)
+    return x0 / x1, y0 / y1, z0 / z1
+end
+
+function vox_math.vector3.mag(x, y, z)
+    return vox_math.sqrt(x*x+y*y+z*z)
+end
+
+function vox_math.vector3.inverse(x, y, z)
+    return -x, -y, -z
+end
+--
 
 function vox_math.e()
     return 2.71828182846
