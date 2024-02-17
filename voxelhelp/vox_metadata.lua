@@ -3,9 +3,15 @@ load_script("voxelhelp:vox_list.lua")
 load_script("voxelhelp:vox_help.lua")
 load_script("voxelhelp:vox_arrays.lua")
 
-vox_metadata = { metadata = { metadataVersion = "1.6", global = { } , blocks = { } }, allowedTypes = vox_arrays.toList({ "nil", "boolean", "string", "number", "table" }) }
+vox_metadata = { internal = { }, prettyStoring = false, metadata = { metadataVersion = "1.6", global = { } , blocks = { } }, allowedTypes = vox_arrays.toList({ "nil", "boolean", "string", "number", "table" }) }
 
-function vox_metadata.internal_checkType(object)
+function vox_metadata.internal.checkKey(key)
+	if key == nil then
+		error("Voxel Help Metadata: Metadata key is nil")
+	end
+end
+
+function vox_metadata.internal.checkType(object)
 	local type = type(object);
 
 	if not vox_metadata.allowedTypes:contains(type) then
@@ -13,11 +19,21 @@ function vox_metadata.internal_checkType(object)
 	end
 end
 
+function vox_metadata.internal.toMetaKey(x, y, z)
+	return x..","..y..","..z
+end
+
+function vox_metadata.internal.updateMeta(x, y, z, posKey)
+	if vox_metadata.metadata["blocks"][posKey] == nil then
+		vox_metadata.metadata["blocks"][posKey] = { }
+	end
+end
+
 function vox_metadata.getMetadataVersion()
 	return vox_metadata.metadataVersion
 end
 
-function vox_metadata.internal_getGlobalTableTree(pathesArray)
+function vox_metadata.internal.getGlobalTableTree(pathesArray)
 	local pathes = vox_arrays.toList(pathesArray)
 
 	local parentTableKey = nil
@@ -45,19 +61,17 @@ function vox_metadata.internal_getGlobalTableTree(pathesArray)
 end
 
 function vox_metadata.setGlobalMetaByPath(key, value, pathesArray)
-	local parentTableKey, parentTable, previousTable = vox_metadata.internal_getGlobalTableTree(pathesArray)
+	local parentTableKey, parentTable, previousTable = vox_metadata.internal.getGlobalTableTree(pathesArray)
 
 	if parentTable ~= nil then
 		previousTable[key] = value
 
 		vox_metadata.setGlobalMeta(parentTableKey, parentTable)
-	else
-		print("nu pizdos")
 	end
 end
 
 function vox_metadata.getGlobalMetaByPath(key, pathesArray)
-	local parentTableKey, parentTable, previousTable = vox_metadata.internal_getGlobalTableTree(pathesArray)
+	local parentTableKey, parentTable, previousTable = vox_metadata.internal.getGlobalTableTree(pathesArray)
 
 	if previousTable ~= nil then
 		return previousTable[key]
@@ -67,7 +81,7 @@ function vox_metadata.getGlobalMetaByPath(key, pathesArray)
 end
 
 function vox_metadata.setGlobalMeta(key, value)
-	vox_metadata.internal_checkType(value)
+	vox_metadata.internal.checkType(value)
 
 	vox_metadata.metadata["global"][key] = value
 end
@@ -76,12 +90,16 @@ function vox_metadata.getGlobalMeta(key)
 	return vox_metadata.metadata["global"][key]
 end
 
+function vox_metadata.existsMeta(x, y, z)
+	return vox_metadata.metadata["blocks"][vox_metadata.internal.toMetaKey(x, y, z)] ~= nil
+end
+
 function vox_metadata.deleteMeta(x, y, z)
-	vox_metadata.metadata["blocks"][x..y..z] = nil
+	vox_metadata.metadata["blocks"][vox_metadata.internal.toMetaKey(x, y, z)] = nil
 end
 
 function vox_metadata.copyMeta(x1, y1, z1, x2, y2, z2)
-	vox_metadata.metadata["blocks"][x2..y2..z2] = vox_metadata.metadata["blocks"][x1..y1..z1]
+	vox_metadata.metadata["blocks"][vox_metadata.internal.toMetaKey(x2, y2, z2)] = vox_metadata.metadata["blocks"][vox_metadata.internal.toMetaKey(x1, y1, z1)]
 end
 
 function vox_metadata.moveMeta(x1, y1, z1, x2, y2, z2)
@@ -90,19 +108,23 @@ function vox_metadata.moveMeta(x1, y1, z1, x2, y2, z2)
 end
 
 function vox_metadata.setMeta(x, y, z, key, value)
-	vox_metadata.internal_checkType(value)
+	vox_metadata.internal.checkKey(key)
 
-	local posKey = x..y..z
+	vox_metadata.internal.checkType(value)
 
-	if vox_metadata.metadata["blocks"][posKey] == nil then
-		vox_metadata.metadata["blocks"][posKey] = { }
-	end
+	local posKey = vox_metadata.internal.toMetaKey(x, y, z)
+
+	vox_metadata.internal.updateMeta(x, y, z, posKey)
 
 	vox_metadata.metadata["blocks"][posKey][key] = value
 end
 
 function vox_metadata.getMeta(x, y, z, key)
-	local posKey = x..y..z
+	vox_metadata.internal.checkKey(key)
+
+	local posKey = vox_metadata.internal.toMetaKey(x, y, z)
+
+	vox_metadata.internal.updateMeta(x, y, z, posKey)
 
 	if vox_metadata.metadata["blocks"][posKey] == nil then
 		return nil
@@ -111,7 +133,7 @@ function vox_metadata.getMeta(x, y, z, key)
 	return vox_metadata.metadata["blocks"][posKey][key]
 end
 
-function vox_metadata.internal_load()
+function vox_metadata.load()
 	local filePath = vox_metadata.getMetadataAbsoluteFilePath()
 
 	if file.exists(filePath) then
@@ -131,12 +153,12 @@ function vox_metadata.internal_load()
 	end
 end
 
-function vox_metadata.internal_store()
-	file.write(vox_metadata.getMetadataAbsoluteFilePath(true), vox_json.encode(vox_metadata.metadata))
+function vox_metadata.store()
+	file.write(vox_metadata.getMetadataAbsoluteFilePath(true), vox_json.encode(vox_metadata.metadata, vox_metadata.prettyStoring))
 end
 
-function vox_metadata.getMetadataAbsoluteFilePath()
-	return vox_help.getAbsoluteVoxelHelpSavesPath() .. "/metadata.json"
+function vox_metadata.getMetadataAbsoluteFilePath(saving)
+	return vox_help.getAbsoluteVoxelHelpSavesPath(saving) .. "/metadata.json"
 end
 
 return vox_metadata

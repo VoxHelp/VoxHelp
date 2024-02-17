@@ -7,23 +7,19 @@ local vox_ticked_block = { onTick = nil }
 local tickedBlocksTable = nil
 local subscribedBlocks = nil
 local blockName = nil
-local blockId = nil
-local initialized = false
+local initialized
 
 function vox_ticked_block:tick(tps)
 	if subscribedBlocks:size() > 0 then
 	    for i = 0, subscribedBlocks:iterations() do
-	    	local subBlock = subscribedBlocks:get(i)
-	    	local subBlockId = get_block(subBlock.x, subBlock.y, subBlock.z)
+	    	if i < subscribedBlocks:size() then
+		    	local subBlock = subscribedBlocks:get(i)
+		    	local subBlockId = get_block(subBlock.x, subBlock.y, subBlock.z)
 
-	    	if subBlockId ~= -1 then
-		    	if subBlockId ~= blockId then
-			    	subscribedBlocks:removeAt(i)
-			    	i = i - 1
-			    else
-			    	vox_ticked_block.onTick(subBlock.x, subBlock.y, subBlock.z, tps)
-			    end
-			end
+		    	if subBlockId ~= -1 then
+				    vox_ticked_block.onTick(subBlock.x, subBlock.y, subBlock.z, tps)
+				end
+	    	end
 	    end
 	end
 end
@@ -39,12 +35,14 @@ function vox_ticked_block:unsubscribe(x, y, z)
 		local someChanges = false
 
 	    for i = 0, subscribedBlocks:iterations() do
-	    	local block = subscribedBlocks:get(i)
+	   	    if i < subscribedBlocks:size() then
+		    	local block = subscribedBlocks:get(i)
 
-		    if block.x == x and block.y == y and block.z == z then
-		    	someChanges = true
-		    	subscribedBlocks:removeAt(i)
-		    end
+			    if block.x == x and block.y == y and block.z == z then
+			    	someChanges = true
+			    	subscribedBlocks:removeAt(i)
+			    end
+			end
 	    end
 
 	    if someChanges then
@@ -66,9 +64,10 @@ function vox_ticked_block:initialize(_blockName)
 		error("Voxel Help Ticked Block: Already initialized")
 	end
 
-	blockName = _blockName
-	blockId = block_id(blockName)
+	initialized = false
 
+	blockName = _blockName
+	
 	subscribedBlocks = vox_arrays.toList(vox_tables.alwaysTable(vox_metadata.getGlobalMetaByPath(blockName, { "voxelhelp", "tickedBlocks" })))
 
 	initialized = true

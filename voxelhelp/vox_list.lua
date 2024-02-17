@@ -6,6 +6,16 @@ function vox_list:fromElement(element)
     return o
 end
 
+function vox_list:foreach(func)
+    if self:size() > 0 then
+        for i = 0, self:iterations() do
+            if func(self:get(i), i) then
+                break
+            end
+        end
+    end
+end
+
 function vox_list:new(_size)
     local o = { _size = 0, _table = { } }
     setmetatable(o, self)
@@ -13,6 +23,14 @@ function vox_list:new(_size)
     self._size = _size or 0
     self._table = { }
     return o
+end
+
+function vox_list:getTable()
+    return self._table
+end
+
+function vox_list:setTable(_table)
+    self._table = _table
 end
 
 function vox_list:toArray()
@@ -33,7 +51,8 @@ function vox_list:print()
 
     if self:size() > 0 then
         for i = 0, self:iterations() do
-            print(self:get(i))
+            local msg = "Index: %i Value: \"%s\""
+            print(msg:format(i, tostring(self:get(i))))
         end
     end
 end
@@ -80,17 +99,18 @@ function vox_list:set(element, index)
         self._size = index
     end
 
-    self._table[index] = element
+    self._table[index + 1] = element
     return true
 end
 
 function vox_list:get(index)
-    if index > self:iterations() or index < 0 then
-        local msg = "Invalid index %i, list size: %i, list iterations: %s"
-        error(msg:format(index, self:size(), self:iterations()))
+    if index >= self:size() or index < 0 then
+        local msg = "Invalid index %i, list size: %i"
+        error(msg:format(index, self:size()))
     end
 
-    return self._table[index]
+
+    return self._table[index + 1]
 end
 
 function vox_list:clone()
@@ -111,12 +131,14 @@ end
 
 function vox_list:indexOf(element)
 
-    for i = 0, self:iterations() do
-        if self:get(i) == element then
-            return i
+    if self:size() > 0 then
+        for i = 0, self:iterations() do
+            if self:get(i) == element then
+                return i
+            end
         end
     end
-
+    
     return -1
 end
 

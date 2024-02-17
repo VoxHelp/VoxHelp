@@ -1,9 +1,14 @@
-local json = load_script("voxelhelp:json.lua")
+local json = load_script("voxelhelp:json/json.lua")
+local pretty_json = load_script("voxelhelp:json/pretty/json.lua")
 
 vox_json = { }
 
-function vox_json.encode(object)
-	return json.stringify(object)
+function vox_json.encode(object, pretty)
+	if pretty then
+		return pretty_json.stringify(object, nil, 4)
+	else
+		return json.stringify(object)
+	end
 end
 
 function vox_json.decode(jsonStr)

@@ -1,29 +1,63 @@
 vox_arrays = load_script("voxelhelp:vox_arrays.lua")
-load_script("voxelhelp:vox_runtime_meta.lua")
+load_script("voxelhelp:vox_math.lua")
 load_script("voxelhelp:vox_list.lua")
 
 vox_utils = { }
 
-function vox_utils.getShiftedPositionRelativeRotation(x, y, z, shift, states)
-	if states == nil then
-		states = get_block_states(x, y, z)
+function vox_utils.getShiftedPositionRelativeRotation(x, y, z, shift)
+	local coords = { }
+
+	coords[1], coords[2], coords[3] = vox_utils.getBlockDirectionVector(x, y, z)
+
+	for i = 1, #coords do
+		if coords[i] ~= 0 then
+			if coords[i] < 0 then
+				coords[i] = -shift
+			else
+				coords[i] = shift
+			end
+		end
 	end
 
-	if states == 5 then
-		y = y - shift
-	elseif states == 4 then
-		y = y + shift
-	elseif states == 0 then
-		z = z + shift
-	elseif states == 2 then
-		z = z - shift
-	elseif states == 3 then
-		x = x + shift
-	elseif states == 1 then
-		x = x - shift
-	end
+	return vox_math.vector3.add(x, y, z, coords[1], coords[2], coords[3])
+end
 
-	return x, y, z
+local directions =
+{
+	["1000010-10"] = { 0, 0, 1 },
+	["001-1000-10"] = { -1, 0, 0 },
+	["-10000-10-10"] = { 0, 0, -1 },
+	["00-11000-10"] = { 1, 0, 0 },
+	["100010001"] = { 0, 1, 0 },
+	["1000-1000-1"] = { 0, -1, 0 }
+}
+
+function vox_utils.blockRotationIsPositive(x, y, z)
+	local dirX, dirY, dirZ = vox_utils.getBlockDirectionVector(x, y, z)
+
+	if dirX == -1 or dirY == -1 or dirZ == -1 then
+		return false
+	else
+		return true
+	end
+end
+
+function vox_utils.blockRotationIsNegative(x, y, z)
+	return not vox_utils.blockRotationIsPositive(x, y, z)
+end
+
+function vox_utils.getBlockDirectionVector(x, y, z)
+	local xrx, xry, xrz = get_block_X(x, y, z)
+	local yrx, yry, yrz = get_block_Y(x, y, z)
+	local zrx, zry, zrz = get_block_Z(x, y, z)
+
+	local direction = directions[xrx..xry..xrz..yrx..yry..yrz..zrx..zry..zrz]
+
+	if direction == nil then
+		return nil, nil, nil
+	else
+		return direction[1], direction[2], direction[3]
+	end
 end
 
 function vox_utils.toBlockIndices(namesList)
@@ -52,7 +86,7 @@ end
 
 function vox_utils.findClosestBlockAlongChainByIDs(x, y, z, chainId, targetIds, checkedMeta)
 	if checkedMeta == nil then
-		checkedMeta = vox_runtime_meta:new()
+		checkedMeta = { }
 	end
 
 	for i = -1, 1, 2 do
@@ -75,10 +109,12 @@ function vox_utils.findClosestBlockAlongChainByIDs(x, y, z, chainId, targetIds, 
 end
 
 function vox_utils.internal_nextChain(x, y, z, chainId, targetIds, checkedMeta)
-	if checkedMeta:getVar(x, y, z, "isChecked") then
+	local key = x..y..z
+
+	if checkedMeta[key] then
 		return -1, -1, -1
 	else
-		checkedMeta:setVar(x, y, z, "isChecked", true)
+		checkedMeta[key] = true
 	end
 
 	local blockId = get_block(x, y, z)
@@ -206,6 +242,10 @@ function vox_utils.isAnyBlockNearbyByIDs(x, y, z, blocks)
 		end
 	end
 	return false
+end
+
+function vox_utils.stop()
+	while true do end
 end
 
 return vox_utils
