@@ -15,6 +15,8 @@ function vox_help.getAbsoluteVoxelHelpSavesPath(saving)
 		end
 	end
 
+	print("tilet")
+
 	if not file.exists(path) and mkdirVoxelHelp then
 		if not pcall(file.mkdir, path) then
 			print("Voxel Help: Failed to create \"voxelhelp\" directory in world save")

@@ -5,6 +5,10 @@ local vox_list = load_script("voxelhelp:vox_list.lua")
 local vox_utils = { }
 
 function vox_utils.getShiftedPositionRelativeRotation(x, y, z, shift)
+	return vox_math.vector3.add(x, y, z, vox_utils.getShiftedVectorRelativeRotation(x, y, z, shift))
+end
+
+function vox_utils.getShiftedVectorRelativeRotation(x, y, z, shift)
 	local coords = { }
 
 	coords[1], coords[2], coords[3] = vox_utils.getBlockDirectionVector(x, y, z)
@@ -19,7 +23,7 @@ function vox_utils.getShiftedPositionRelativeRotation(x, y, z, shift)
 		end
 	end
 
-	return vox_math.vector3.add(x, y, z, coords[1], coords[2], coords[3])
+	return coords[1], coords[2], coords[3]
 end
 
 local directions =

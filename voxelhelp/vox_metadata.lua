@@ -2,6 +2,7 @@ local vox_json = load_script("voxelhelp:vox_json.lua")
 local vox_list = load_script("voxelhelp:vox_list.lua")
 local vox_help = load_script("voxelhelp:vox_help.lua")
 local vox_arrays = load_script("voxelhelp:vox_arrays.lua")
+local vox_tables = load_script("voxelhelp:vox_tables.lua")
 
 local vox_metadata = { internal = { }, prettyStoring = false, metadata = { metadataVersion = "1.6", global = { } , blocks = { } }, allowedTypes = vox_arrays.toList({ "nil", "boolean", "string", "number", "table" }) }
 

@@ -1,7 +1,6 @@
 local json = load_script("voxelhelp:json/json.lua")
 local pretty_json = load_script("voxelhelp:json/pretty/json.lua")
-
-vox_json = { }
+local vox_json = { }
 
 function vox_json.encode(object, pretty)
 	if pretty then
