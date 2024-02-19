@@ -140,21 +140,20 @@ function luamath.internal.ln(n)
 end
 
 function luamath.log10(n)
-    if n > 0 then return luamath.internal.integral(F,1,n)/luamath.internal.ln(10) end
+    if n > 0 then return luamath.internal.integral(F,1,n)/2.302585092994046 end
 end
 
 function luamath.sqrt(n)
-    if n >= 0 then return n^(1/2) end
+    if n >= 0 then return n^(0.5) end
 end
 
 function luamath.sin(t)
     t = t%6.28318530718
-    return t - t^3/6 + t^5/120 - t^7/5040 + t^9/362880 - t^11/39916800 + 
-t^13/6227020800 - t^15/1307674368000 + t^17/355687428096000 - t^19/121645100408832000 + t^21/51090942171709440000 - t^23/25852016738884976640000 + t^25/15511210043330985984000000 - t^27/10888869450418352160768000000 + t^29/8841761993739701954543616000000 - t^31/8222838654177922817725562880000000 + t^33/8683317618811886495518194401280000000 - t^35/10333147966386144929666651337523200000000 + t^37/13763753091226345046315979581580902400000000
+    return t - t^3/6 + t^5/120 - t^7/5040 + t^9/362880 - t^11/39916800 + t^13/6227020800 - t^15/1307674368000 + t^17/355687428096000 - t^19/121645100408832000 + t^21/51090942171709440000 - t^23/25852016738884976640000 + t^25/15511210043330985984000000 - t^27/10888869450418352160768000000 + t^29/8841761993739701954543616000000 - t^31/8222838654177922817725562880000000 + t^33/8683317618811886495518194401280000000 - t^35/10333147966386144929666651337523200000000 + t^37/13763753091226345046315979581580902400000000
 end
 
 function luamath.cos(t)
-    return luamath.sin(t + luamath.pi/2)
+    return luamath.sin(t + 1.570796326794897)
 end
 
 function luamath.tan(n)
@@ -170,12 +169,7 @@ function luamath.atan(t)
 end
 
 function luamath.atan2(y, x)
-    local func = 0
-    local k = y/x
-    for n=0,1000 do
-        func = func + ((-1)^n)*((k^(2*n+1))/(2*n+1))
-    end
-    return func
+    return luamath.atan(y/x)
 end
 
 function luamath.asin(t)
@@ -188,32 +182,16 @@ function luamath.acos(x)
     if x == -1 then return luamath.pi end
     if x ==  0 then return luamath.pi / 2 end
     if x ==  1 then return 0 end
-    local closeEnough = 1e-10
-    local low = 0
-    local high = luamath.pi
-    local mid
-    local cosmid
-    while true do
-        mid = (high + low) / 2
-        cosmid = luamath.cos(mid)
-        if luamath.abs(x - cosmid) <= closeEnough then
-            return mid
-        end
-
-        if cosmid > x then
-            low = mid
-        else
-            high = mid
-        end
-    end
+    return 2*luamath.asin((1-x)^(0.5)/1.414213562373095)
 end
 
+
 function luamath.rad(alpha)
-    return (alpha*luamath.pi)/180
+    return alpha*0.0174532925199433
 end
 
 function luamath.deg(alpha)
-    return (alpha*180)/luamath.pi
+    return alpha*57.29577951308232
 end
 
 function luamath.ldexp(x, exp)
