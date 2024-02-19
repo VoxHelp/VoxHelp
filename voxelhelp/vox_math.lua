@@ -76,7 +76,7 @@ end
 -- @param xyz — вектор
 -- @return Округлённый вектор
 function vox_math.vector3.round(x, y, z)
-    return math.round(x), math.round(y), math.round(z)
+    return vox_math.round(x), vox_math.round(y), vox_math.round(z)
 end
 
 ---Вычисляет дистанцию между первым и вторым вектором
@@ -242,44 +242,6 @@ end
 -- @return Минимум и максимум
 function vox_math.minmax(num1,num2)
     return math.min(num1,num2), math.max(num1,num2)
-end
-
-function vox_math.coth(x) -- гипербо-ий котангенс
-    return 1/vox_math.tanh(x)
-end
-
-function vox_math.sch(x) -- гипербо-ий секас
-    if x ~= 0 then return 1/vox_math.ch(x) end
-end
-
-function vox_math.csch(x) -- гипербо-ий косекас
-    if x ~= 0 then return 1/vox_math.sh(x) end
-end
-
-function vox_math.arsh(x) -- гипербо-ий обратный синус
-    return vox_math.ln(x+(x^2+1)^0.5)
-end
-
-function vox_math.arth(x) -- гипербо-ий обратный тангенс
-    if math.abs(x)<1 then 
-        return vox_math.ln(((1-x^2)^0.5)/(1-x))
-    end
-end
-
-function vox_math.arch(x) -- гипербо-ий обратный косинус
-    if x >= 1 then return vox_math.ln(x+(x^2-1)^0.5) end
-end
-
-function vox_math.arcth(x) -- гипербо-ий обратный котангенс
-    if math.abs(x) > 1 then 
-        return vox_math.ln(((x^2-1)^0.5)/(x-1))
-    end
-end
-
-function vox_math.arsch(x) -- гипербо-ий обратный секас
-    if x > 0 and x <= 1 then
-        return vox_math.ln((1+(1-x^2)^0.5)/(x))
-    end
 end
 
 ------------------------------------------------
