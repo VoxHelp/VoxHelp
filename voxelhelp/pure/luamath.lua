@@ -220,6 +220,8 @@ function luamath.ldexp(x, pow)
     return x * (2 ^ pow)
 end
 
+luamath.internal.log2 = luamath.log(2)
+
 function luamath.frexp(x)
     if x == 0 then return 0.0,0.0 end
     local e = luamath.floor(luamath.log(luamath.abs(x)) / luamath.internal.log2)

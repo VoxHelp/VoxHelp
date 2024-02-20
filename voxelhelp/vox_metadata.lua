@@ -1,4 +1,4 @@
-local vox_json = load_script("voxelhelp:vox_json.lua")
+local json = load_script("voxelhelp:modules/json.lua")
 local vox_list = load_script("voxelhelp:vox_list.lua")
 local vox_help = load_script("voxelhelp:vox_help.lua")
 local vox_arrays = load_script("voxelhelp:vox_arrays.lua")
@@ -141,7 +141,7 @@ function vox_metadata.load()
 		local rawMetadata = file.read(filePath)
 
 		if rawMetadata ~= nil then
-			vox_metadata.metadata = vox_json.decode(rawMetadata)
+			vox_metadata.metadata = json.deserialize(rawMetadata)
 
 			if vox_metadata.metadata["blocks"] == nil then
 				vox_metadata.metadata["blocks"] = { }
@@ -155,7 +155,7 @@ function vox_metadata.load()
 end
 
 function vox_metadata.store()
-	file.write(vox_metadata.getMetadataAbsoluteFilePath(true), vox_json.encode(vox_metadata.metadata, vox_metadata.prettyStoring))
+	file.write(vox_metadata.getMetadataAbsoluteFilePath(true), json.serialize(vox_metadata.metadata, vox_metadata.prettyStoring))
 end
 
 function vox_metadata.getMetadataAbsoluteFilePath(saving)
