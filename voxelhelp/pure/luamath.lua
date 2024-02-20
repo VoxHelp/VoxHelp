@@ -1,4 +1,4 @@
-local luamath = { e = 2.71828182846, pi = 3.14159265358979, huge = 1.0 / 0.0, internal = { randMax = 32767, holdrand = 0, log2 = luamath.log(2), nan = 0 / 0 } }
+local luamath = { e = 2.71828182846, pi = 3.14159265358979, huge = 1.0 / 0.0, internal = { randMax = 32767, holdrand = 0, log2 = 0, nan = 0 / 0 } }
 
 local bit32 = bit32
 
@@ -219,6 +219,8 @@ end
 function luamath.ldexp(x, exp)
     return x * (2 ^ exp)
 end
+
+luamath.internal.log2 = luamath.log(2)
 
 function luamath.frexp(x)
     if x == 0 then return 0.0,0.0 end

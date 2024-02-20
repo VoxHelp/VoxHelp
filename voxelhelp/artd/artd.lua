@@ -29,14 +29,10 @@ end
 local function deserialize_array(index, lines, strictParse)
     local array = { }
 
-    local arrIndex = index
+    local length = tonumber(string.sub(lines[index], 2))
 
-    local arrInfo = lines[arrIndex]
-
-    local length = tonumber(string.sub(arrInfo, 2))
-
-    for i = 1, length  do
-        index = arrIndex + i
+    for i = 1, length do
+        index = index + 1
 
         local value = nil
         local str = lines[index]
@@ -60,14 +56,13 @@ local function deserialize_array(index, lines, strictParse)
         elseif prefix == NUM then
             value = tonumber(rawValue)
         elseif prefix == ARR then
-            value = deserialize_array(index, lines, strictParse)
+            value, index = deserialize_array(index, lines, strictParse)
         elseif strictParse then
             error("Invalid prefix "..prefix.." at line "..index)
         end
 
         array[i] = value
     end
-
     return array, index
 end
 
@@ -134,7 +129,9 @@ function artd.deserialize(arg, strictParse)
         error("Invalid ARTD")
     end
 
-    return deserialize_array(1, lines, strictParse)
+    local doc, _ = deserialize_array(1, lines, strictParse)
+
+    return doc
 end
 
 return artd

@@ -1,12 +1,17 @@
 local json = { }
-local vox_json = load_script("voxelhelp:vos_json")
+local default_json= load_script("voxelhelp:json/json.lua")
+local pretty_json = load_script("voxelhelp:json/pretty/json.lua")
 
-function json.serialize(obj, pretty)
-	return vox_json.encode(obj, pretty)
+function json.serialize(object, pretty)
+	if pretty then
+		return pretty_json.stringify(object, nil, 4)
+	else
+		return default_json.stringify(object)
+	end
 end
 
-function json.deserialize(str)
-	return vox_json.decode(str)
+function json.deserialize(jsonStr)
+	return default_json.parse(jsonStr);
 end
 
 return json
