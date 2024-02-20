@@ -155,7 +155,7 @@ function vox_metadata.load()
 end
 
 function vox_metadata.store()
-	file.write(vox_metadata.getMetadataAbsoluteFilePath(true), json.serialize(vox_metadata.metadata, vox_metadata.prettyStoring))
+	file.write(vox_metadata.getMetadataAbsoluteFilePath(), json.serialize(vox_metadata.metadata, vox_metadata.prettyStoring))
 end
 
 function vox_metadata.getMetadataAbsoluteFilePath(saving)
