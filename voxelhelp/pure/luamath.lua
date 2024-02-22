@@ -127,36 +127,27 @@ function luamath.tanh(x)
     else return t > 0 and 1 or t < 0 and -1 or 0 end
 end
 
-function luamath.internal.f(x)
-    if x~=0 then return 1/x end  
-end
 
-function luamath.internal.integral(f,a,b)
-    local steps = 1e6
-    local h = (b - a) / steps
-    local sum = 0.5 * (luamath.internal.f(a) + luamath.internal.f(b))
-    for i = 1, steps - 1 do
-        sum = sum + luamath.internal.f(a + i * h)
+function luamath.internal.log(num, base)
+    local start, finish, middle = 0, 0, 0
+    if num or base <= 0 or num == 1 then return luamath.internal.nan end
+    if base == nil then base = 2.3025850929940456840 end
+    if base^start == num then return start end
+    while base^finish <= num do finish=finish+1 end
+    start = finish - 1
+    for i = 1, 56 do
+        middle = (start + finish) / 2
+        if base^middle > num then finish = middle else start = middle end
     end
-    return h * sum
-end
-
-function luamath.log(n, base)
-    if base == nil then
-        return luamath.internal.ln(n) or luamath.internal.nan
-    end
-
-    if base > 0 or base ~= 1 or n > 0 then
-        return luamath.internal.integral(F,1,n) / luamath.internal.integral(F,1,base)
-    end
+    return middle
 end
 
 function luamath.internal.ln(n)
-    if n > 0 then return luamath.internal.integral(F,1,n) end
+    if n > 0 then return luamath.internal.log(num, luamath.e) end
 end
 
-function luamath.log10(n)
-    if n > 0 then return luamath.internal.integral(F,1,n)/2.3025850929940456840 end
+function luamath.lg(n)
+    if n > 0 then return luamath.internal.log(num) end
 end
 
 function luamath.sqrt(n)
@@ -220,7 +211,6 @@ function luamath.ldexp(x, pow)
     return x * (2 ^ pow)
 end
 
-luamath.internal.log2 = luamath.log(2)
 
 function luamath.frexp(x)
     if x == 0 then return 0.0,0.0 end
