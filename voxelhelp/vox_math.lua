@@ -1,4 +1,18 @@
-local vox_math = { vector3 = { } }
+local vox_math = { 
+    table_factorial = {
+        1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800, 
+        479001600, 6227020800, 87178291200, 1307674368000, 20922789888000, 
+        355687428096000, 6402373705728000, 121645100408832000, 
+        2432902008176640000, 51090942171709440000, 1124000727777607680000, 
+        25852016738884976640000, 620448401733239439360000, 
+        15511210043330985984000000, 403291461126605635584000000, 
+        10888869450418352160768000000, 304888344611713860501504000000, 
+        8841761993739701954543616000000, 265252859812191058636308480000000,
+        8222838654177922817725562880000000,
+        263130836933693530167218012160000000,
+        8683317618811886495518194401280000000}, 
+    vector3 = { } 
+}
 
 -- Onran Part
 
@@ -35,6 +49,9 @@ end
 function vox_math.vector3.div(x0, y0, z0, x1, y1, z1)
     return x0 / x1, y0 / y1, z0 / z1
 end
+
+function vox_math.vector3.floordiv(x0, y0, z0, x1, y1, z1)
+    return math.floor(x0/x1), math.floor(y0/y1), math.floor(z0/z1)
 
 ---Вычисляет величину вектора
 -- @param xyz — вектор
@@ -85,7 +102,7 @@ end
 -- @return Дистанция между векторами
 -- function by Cogitary
 function vox_math.vector3.distance(x0,y0,z0,x1,y1,z1) -- дистанция от A(x0,y0,z0) до B(x1,y1,z1)
-    return ((x1-x0)^2+(y1-y0)^2+(z1-z0)^2)^(1/2)
+    return ((x1-x0)^2+(y1-y0)^2+(z1-z0)^2)^(0.5)
 end
 
 --
@@ -103,7 +120,7 @@ end
 -- @param n — число
 -- @return Факториал числа n
 function vox_math.factorial(n)
-    if n == 0 then return 1
+    if n < 33 then return vox_math.table_factorial[n]
     elseif n<0 then error("Voxel Help Math: Parameter \"n\" must always be greater than -1")
     else return n * vox_math.factorial(n - 1) end
 end
@@ -112,8 +129,9 @@ end
 -- @param n — число
 -- @return Факториал числа n
 function vox_math.factorialSaves(n) -- non stack overflow
-    if n < 0 then error("Voxel Help Math: Parameter \"n\" must always be greater than -1") end
-    local f = 1 for i = 2, n do f = f * i end
+    if n < 33 then return vox_math.table_factorial[n]
+    elseif n < 0 then error("Voxel Help Math: Parameter \"n\" must always be greater than -1") 
+    else local f = 1 for i = 2, n do f = f * i end end
     return f
 end
 
@@ -161,9 +179,15 @@ end
 -- @param n — число
 -- @return Знак числа, если число равно нулю то 0, если число положительное то 1, если число отрицательное то -1
 function vox_math.sign(n)-- определения знака
-    return n == 0 and 0 or n / math.abs(n)
+    return n < 0 and -1 or 1
 end
 
+
+function vox_math.floordiv(a, b)
+    return math.floor(a/b)
+end
+
+--Integrate (APPROX)
 --- Вычисляет определенный интеграл функции `f` на интервале `[a, b]`.
 -- Функция использует правило трапеций для аппроксимации определенного интеграла.
 -- @function vox_math.integral
@@ -174,10 +198,10 @@ end
 
 -- @usage
 -- -- Пример: аппроксимировать интеграл sin(x) от 0 до pi/2 (1,57...)
--- print(vox_math.integral(math.sin, 0, 1.57)) -- Выводит 1
+-- >> print(vox_math.integral(math.sin, 0, 1.57)) -- Выводит 1
 --
 -- -- Пример: аппроксимировать интеграл sin(x) от -pi до pi
--- print(vox_math.integral(math.sin, -math.pi, math.pi)) -- Выводит 0
+-- >> print(vox_math.integral(math.sin, -math.pi, math.pi)) -- Выводит 0
 
 -- Пример: вычисление натурального логарифма с использованием определенного интеграла
 --    function vox_math.ln(n)
@@ -185,40 +209,41 @@ end
 --             return vox_math.integral(F,1,n) 
 --        end
 --    end
-function vox_math.integral(f,a,b) 
-    local steps = 1e6
-    local h = (b - a) / steps
-    local sum = 0.5 * (f(a) + f(b))
-    for i = 1, steps - 1 do
-        sum = sum + f(a + i * h)
+function vox_math.integrate(f,a,b) 
+    if math.abs(a-b) < 30 then
+        local steps = 1e6
+        local h = (b - a) / steps
+        local sum = 0.5 * (f(a) + f(b))
+        for i = 1, steps - 1 do
+            sum = sum + f(a + i * h)
+        end
+        return vox_math.round(h * sum,6)
     end
-    return vox_math.round(h * sum,6)
 end
 
 
-local Dfunc = function (f, x)
-    local h = 1e-12  -- точность 
-    return (f(x + h) - f(x)) / h
-end
 
---- Диффур
+--- Диффур (approx)
 -- Функция работает как простой численный дифференциал (дифференциальный оператор)
 -- Например, если у нас есть функция f(x) = sin(x) в точке x = 0 и мы хотим взять производную
 --  f'(x) = cos(x), тогда мы будем использовать эту функцию как D(sin, 0) и результат должен быть 1, так как cos(0) = 1.
--- @param f - функция для дифференциации
+-- @param F - функция для дифференциации
 -- @param x - точка, в которой будет рассчитана производная
 -- @return производная функции в точке x
-
+local Dfunc = function (F, x)
+    if F == nil then return 0 end
+    local h = 1e-10 
+    return (F(x + h) - F(x)) / h
+end
 vox_math.D = Dfunc
-
-vox_math.diffur = Dfunc
+vox_math.derivative = Dfunc
 
 
 --- Экспанента
 -- @param x - аргумент экспоненты
 -- @return значение экспоненты в точке x
 function vox_math.exp(x)
-    return math.e^x
+    return 2.71828182845904523536028747135^x
 end
 
 --- Дистанция между двумя 2D векторами
@@ -229,9 +254,11 @@ function vox_math.dist2(x0,y0,x1,y1)
     return ((x1-x0)^2+(y1-y0)^2)^0.5
 end
 
-function vox_math.hypot(x,y)
-    return (x*x+y*y)^0.5
-end
+function vox_math.hypot(x, y)
+    x = math.abs(x)
+    y = math.abs(y)
+    return x > y and x*(1 + (y / x) * (y / x))^0.5 or y*(1 + (x / y) * (x / y))^0.5
+  end
 
 --- Дистанция между двумя точками
 -- @param x0 - первая точка
@@ -252,15 +279,13 @@ end
 ------------------------------------------------
 
 -- Операции перевода
-
-
 --- Переход к полярным координатам
 -- @param x  x-координата в декартовой системе координат
 -- @param y  y-координата в декартовой системе координат
 -- @return r  Радиус в полярной системе координат
 -- @return phi  Угол в полярной системе координат
 function vox_math.toPolar(x,y)
-    local r = (x^2+y^2)^0.5
+    local r = (x*x+y*y)^0.5
     local phi = math.atan2(y,x)
     return r, phi
 end
@@ -291,7 +316,6 @@ end
 
 
 -- Static
-
 --- Расчёт биномиального коэффициента nk
 -- (Выполняет расчёт количества возможностей выбора k элементов из множества длиною в n элементов без учёта порядка)
 -- @param n Количество элементов в множестве
