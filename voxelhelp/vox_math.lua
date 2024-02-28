@@ -182,7 +182,9 @@ function vox_math.sign(n)-- определения знака
     return n < 0 and -1 or 1
 end
 
-
+--  Целочисленное деление (a//b)
+--  @param a, b : [Real]
+--  @return a//b : [int]
 function vox_math.floordiv(a, b)
     return math.floor(a/b)
 end
@@ -361,6 +363,91 @@ function vox_math.A(n, m)
         result = result * i 
     end
     return result
+end
+
+--  Пифагоровы тройки 
+--  @param n, m (integer)
+--  @return a,b,c (integer)
+function pyth(m, n)
+    local i = m*m
+    local j = n*n
+    return i-j,2*m*n,i+j
+end
+
+
+-- Символ Кронекера
+function delta_kron(i,j)
+    return 1 if i == j else 0
+end
+
+--  Проверка --
+--  Является ли число квадратом другого числа.
+function is_square(n)
+    return n > 0 and math.floor(math.sqrt(n)) ^ 2 == n
+end
+
+--  Является ли число степенью другого числа.
+function is_power(a, b)
+    return a > 0 and b > 0 and math.floor(a ^ (1 / b)) ^ b == a
+end
+
+--  Является ли число числом Пифагора (число, которое дает три пары чисел).
+function is_prime(n)
+    if n < 2 then
+        return false
+    end
+    for i = 2, math.ceil(math.sqrt(n)) do
+        if n % i == 0 then
+            return false
+        end
+    end
+    return true
+end
+
+function is_perfect(n)
+    local sum = 0
+    for i = 1, n - 1 do
+        if n % i == 0 then
+            sum = sum + i
+        end
+    end
+    return sum == n
+end
+
+-- function is_amicable(a, b)
+--     local sum1 = 0
+--     local sum2 = 0
+--     for i = 1, a - 1 do
+--         if a % i == 0 then
+--             sum1 = sum1 + i
+--         end
+--     end
+--     for j = 1, b - 1 do
+--         if b % j == 0 then
+--             sum2 = sum2 + j
+--         end
+--     end
+--     return sum1 == sum2
+-- end
+
+function is_mersenne(n)
+    return n > 1 and 2 ^ n - 1 == n
+end
+
+function is_pyth(n)
+    local found = false
+    for a = 1, n - 1 do
+        for b = a, n - 1 do
+            if a ^ 2 + b ^ 2 == n then
+                found = true
+                break
+            end
+        end
+        if found then
+            break
+        end
+    end
+    return found
 end
 
 return vox_math
