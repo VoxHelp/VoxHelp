@@ -9,7 +9,6 @@ function vox_arrays.createArrayFromElement(element)
 end
 
 function vox_arrays.array_contains(array, element)
-
 	for i = 0, #array do
 		if array[i] == element then
 			return true
@@ -36,11 +35,7 @@ function vox_arrays.toList(array)
 end
 
 function vox_arrays.size(array) --размер массива
-    local size = 0
-    for _, _ in pairs(array) do
-        size = size + 1
-    end
-    return size
+    return #array
 end
 
 function vox_arrays.toString(array) --преобразование массива в строку
@@ -67,8 +62,21 @@ function vox_arrays.every(array, func) -- проверка отсутствие 
 end
 
 function vox_arrays.clear()
-	local self = {}
-	return self
+	return {}
+end
+
+function vox_arrays.sort()
+    local lenght_arr = #self
+    for i = 1, lenght_arr, 1 do
+        local min_index = i
+        for j = i + 1, lenght_arr, 1 do
+            if self[j] < self[min_index] then
+                min_index = j
+            end
+        end
+        self[i], self[min_index] = self[min_index], self[i]
+    end
+    return self
 end
 
 return vox_arrays
